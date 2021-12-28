@@ -2,14 +2,25 @@
 local Cube
 local particle
 
+function DestroyJetpack()
+    if Cube then
+        if Cube:IsValid() then
+            Cube:Destroy()
+        end
+        Cube = nil
+    end
+    particle = nil
+end
+
 Input.Bind("Jump", InputEvent.Pressed, function()
     --print("Jump")
     local ply = Client.GetLocalPlayer()
     if ply then
         local char = ply:GetControlledCharacter()
         if char then
+            DestroyJetpack()
             if not char:IsInRagdollMode() then
-                if (char:GetFallDamageTaken() == 0 or char:GetFallingMode() ~= FallingMode.HighFalling) then
+                if ((char:GetFallDamageTaken() == 0 and char:GetFallingMode() == FallingMode.HighFalling) or char:GetFallingMode() == FallingMode.Falling) then
                     Cube = StaticMesh(
                         Vector(0, 0, 0),
                         Rotator(0, 0, 0),
@@ -36,12 +47,4 @@ Input.Bind("Jump", InputEvent.Pressed, function()
 end)
 
 
-Input.Bind("Jump", InputEvent.Released, function()
-    if Cube then
-        if Cube:IsValid() then
-            Cube:Destroy()
-        end
-        Cube = nil
-    end
-    particle = nil
-end)
+Input.Bind("Jump", InputEvent.Released, DestroyJetpack)
